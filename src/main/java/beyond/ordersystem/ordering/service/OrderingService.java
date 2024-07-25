@@ -58,6 +58,7 @@ public class OrderingService {
             Product product = productRepository.findById(orderDto.getProductId()).orElseThrow(()->new EntityNotFoundException("not found"));
 
             OrderDetail orderDetail = OrderDetail.builder()
+                    .ordering(ordering)
                     .product(product)
                     .quantity(orderDto.getProductCnt())
                     .build();
