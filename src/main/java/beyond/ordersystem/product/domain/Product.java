@@ -48,4 +48,8 @@ public class Product {
         this.imagePath = imagePath;
     }
 
+    public void updateStockQuantity(int quantity) {
+        this.stockQuantity = this.stockQuantity - quantity;
+    }
+
 }

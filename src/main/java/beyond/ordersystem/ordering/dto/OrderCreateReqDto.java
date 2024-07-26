@@ -21,39 +21,21 @@ public class OrderCreateReqDto {
 
     private Long memberId;
 
-    private List<OrderProductInfo> orderProducts;
+    private List<OrderDto> orderDtos;
 
     @Data
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class OrderProductInfo {
+    public static class OrderDto { // class 내에 만들거라 static, 직접 접근 가능해야해서 public
         private Long productId;
         private Integer productCnt;
     }
 
-//    public Ordering toEntity() {
-//
-//        Ordering ordering = Ordering.builder()
-//                .orderStatus(OrderStatus.ORDERED)
-//                .member()
-//                .build();
-//    }
-
-//    public Ordering orderingToEntity(Member member) {
-
-//        Ordering ordering = Ordering.builder()
-//                .member(member)
-//                .orderStatus(OrderStatus.ORDERED)
-//                .orderDetails()
-//                .build();
-//        return ordering;
-//    }
-//    public OrderDetail orderDetilToEntity() {
-//        OrderDetail orderDetail = OrderDetail.builder()
-//
-//                .build();
-//
-//        return orderDetail;
-//    }
+    public Ordering toEntity(Member member){
+        return Ordering.builder()
+                .member(member)
+                .orderStatus(OrderStatus.ORDERED)
+                .build();
+    }
 }
