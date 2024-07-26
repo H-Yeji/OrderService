@@ -38,6 +38,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	// redis 의존성 추가
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// jwt 토큰 관련 라이브러리 추가
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 }
 
 tasks.named('test') {
