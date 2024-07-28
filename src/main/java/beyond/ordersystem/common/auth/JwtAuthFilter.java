@@ -54,18 +54,23 @@ public class JwtAuthFilter extends GenericFilter {
                 String token = bearerToken.substring(7);
                 // token 검증 및 claims(사용자 정보) 추출
                 // token 생성시에 사용한 secret 키 값을 넣어 토큰 검증에 사용
+                // secretKey를 사용해 jwt 토큰을 검증하고, 토큰이 유효한지 확인
+                // -> 유효한 토큰이면 토킅에서 사용자 정보인 claims를 추출
                 Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
 
                 //Authentication 객체 생성 ( 여기 안에 사용자 이메일, 롤 이런거 들어있음)
-                // userDetail 객체도 필요
+                // 사용자 권한을 담는 authorities 리스트 생성 > claims에서 추출한 역할(role)를 기반으로 권한 추가
                 List<GrantedAuthority> authorities = new ArrayList<>();
                 authorities.add(new SimpleGrantedAuthority("ROLE_" + claims.get("role")));
-                // .getSubject가 email을 말함, 마지막은 권한을 넣는 것
+                // .getSubject가 email을 말함 > claims.getSubject로 사용자 이메일 가져와서 UserDetails 객체 생성
                 UserDetails userDetails = new User(claims.getSubject(), "", authorities);
+                // userDetail 객체 기반으로 UsernamePasswordAuthenticationToken 생성해서 Authentication 객체 생성
                 Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 
+                // SecurityContextHolder를 사용해 현재 보안 컨텍스트에 인증 정보 전달
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
+                // 이렇게 인증 정보까지 전달하면 -> 애플리케이션은 이후 요청에서 해당 사용자가 "인증된 사용자"임을 확인할 수 있음 ⭐
             }
             // filterChain에서 그 다음 filtering으로 넘어가도록 하는 메서드
             filterChain.doFilter(request, response);
