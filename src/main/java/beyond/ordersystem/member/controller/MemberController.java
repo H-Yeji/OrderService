@@ -31,7 +31,7 @@ import java.util.Objects;
 @Slf4j
 public class MemberController {
 
-    private static final Logger log = LoggerFactory.getLogger(MemberController.class);
+    //private static final Logger log = LoggerFactory.getLogger(MemberController.class);
     private final MemberService memberService;
     private final JwtTokenProvider jwtTokenProvider;
 
