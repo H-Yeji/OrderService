@@ -110,7 +110,7 @@ public class OrderingService {
         List<Ordering> orderDetailList = orderingRepository.findAll();
 
         List<OrderListResDto> orderListResDtos = new ArrayList<>();
-        for (Ordering ordering : orderDetailList) {
+        for (Ordering ordering : orderDetailList) { // 전체 order 내역에서 진행
             orderListResDtos.add(ordering.listFromEntity());
         }
 
@@ -132,7 +132,7 @@ public class OrderingService {
 
         log.info("order Detail list : " + myOrders);
         List<OrderListResDto> orderResDtos = new ArrayList<>();
-        for (Ordering ordering : myOrders) {
+        for (Ordering ordering : myOrders) { // 본인 주문 내역에서만 진행
             orderResDtos.add(ordering.listFromEntity());
         }
         return orderResDtos;

@@ -165,7 +165,7 @@ public class MemberController {
             return new ResponseEntity<>(new CommonErrorDto(HttpStatus.UNAUTHORIZED.value(), "invalid refresh token"),
                     HttpStatus.UNAUTHORIZED);
         }
-
+        // redis에 일치하는 rt가 있다면 이어서 ㄱㄱ
         String newAt = jwtTokenProvider.createToken(email, role); // 새로 at를 받아야하니까 createToken
         // 생성된 토큰을 commonResDto에 담아 사용자에게 return
         Map<String, Object> info = new HashMap<>();

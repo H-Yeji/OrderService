@@ -46,7 +46,7 @@ public class Ordering {
     public OrderListResDto listFromEntity() {
 
         List<OrderDetail> orderDetailList = this.getOrderDetails();
-        List<OrderListResDto.OrderDetailDto> orderDetailDtos = new ArrayList<>();
+        List<OrderListResDto.OrderDetailDto> orderDetailDtos = new ArrayList<>(); // id, productName, count
 
         for (OrderDetail orderDetail : orderDetailList) {
             orderDetailDtos.add(orderDetail.fromEntity());
