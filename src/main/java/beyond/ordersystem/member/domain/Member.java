@@ -2,13 +2,11 @@ package beyond.ordersystem.member.domain;
 
 import beyond.ordersystem.common.domain.Address;
 import beyond.ordersystem.common.domain.BaseTimeEntity;
-import beyond.ordersystem.member.dto.MemberListResDto;
+import beyond.ordersystem.member.dto.MemberResDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 
@@ -36,16 +34,26 @@ public class Member extends BaseTimeEntity {
     @Builder.Default
     private Role role = Role.USER;
 
-    public MemberListResDto listFromEntity() {
+    public MemberResDto listFromEntity() {
 
-        MemberListResDto memberListResDto = MemberListResDto.builder()
+        MemberResDto memberResDto = MemberResDto.builder()
                 .id(this.id)
                 .name(this.name)
                 .email(this.email)
                 .address(this.address)
                 .build();
 
-        return memberListResDto;
+        return memberResDto;
+    }
+
+    public MemberResDto myDetailFromEntity(String myEmail, String myName, Address myAddress) {
+        MemberResDto memberResDto = MemberResDto.builder()
+                .name(myName)
+                .email(myEmail)
+                .address(myAddress)
+                .build();
+
+        return memberResDto;
     }
 
 }

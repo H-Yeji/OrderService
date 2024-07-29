@@ -29,7 +29,7 @@ public class MemberCreateReqDto {
     private String street;
     private String zipcode;
     private Address address;
-    //private Role role;
+    private Role role = Role.USER;
 
     public Member toEntity(String encodedPassword) {
         Member member = Member.builder()
@@ -42,7 +42,7 @@ public class MemberCreateReqDto {
 //                        .zipcode(this.zipcode)
 //                        .build())
                 .address(this.address)
-                .role(Role.USER) // 어노테이션 default가 안먹어서 이걸로 대체(admin 안들어감)
+                .role(this.role)
                 .build();
         return member;
     }

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +28,7 @@ public class ProductController {
     /**
      * 상품 등록
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     // 파일도 받는건데 다시 공부 ㄱㄱ (requestBody로 받지 않는 이유 -> 파일때문인데 확인)
     public ResponseEntity<?> createProduct(ProductCreateReqDto dto) {

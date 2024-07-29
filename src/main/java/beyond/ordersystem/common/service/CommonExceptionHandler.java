@@ -15,7 +15,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<CommonErrorDto> entityNotFoundHnadler(EntityNotFoundException e) {
-
+        e.printStackTrace();
         CommonErrorDto commonErrorDto = new CommonErrorDto(HttpStatus.NOT_FOUND.value(), e.getMessage());
 
         return new ResponseEntity<>(commonErrorDto, HttpStatus.NOT_FOUND);
@@ -23,7 +23,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<CommonErrorDto> illegalArgumentHandler(IllegalArgumentException e) {
-
+        e.printStackTrace();
         CommonErrorDto commonErrorDto = new CommonErrorDto(HttpStatus.BAD_REQUEST.value(), e.getMessage());
 
         return new ResponseEntity<>(commonErrorDto, HttpStatus.BAD_REQUEST);
@@ -33,7 +33,7 @@ public class CommonExceptionHandler {
     // validation 에러 잡아가기
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<CommonErrorDto> validHandler(MethodArgumentNotValidException e) {
-
+        e.printStackTrace();
         CommonErrorDto commonErrorDto = new CommonErrorDto(HttpStatus.BAD_REQUEST.value(), "arguments is not valid");
 
         return new ResponseEntity<>(commonErrorDto, HttpStatus.BAD_REQUEST);
@@ -41,7 +41,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<CommonErrorDto> exceptionHandler(Exception e) {
-
+        e.printStackTrace();
         CommonErrorDto commonErrorDto = new CommonErrorDto(HttpStatus.INTERNAL_SERVER_ERROR.value(), "server error");
 
         return new ResponseEntity<>(commonErrorDto, HttpStatus.INTERNAL_SERVER_ERROR);

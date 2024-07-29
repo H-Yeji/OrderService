@@ -19,18 +19,23 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderCreateReqDto {
 
-    private Long memberId;
 
-    private List<OrderDto> orderDtos;
+    private Long productId;
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class OrderDto { // class 내에 만들거라 static, 직접 접근 가능해야해서 public
-        private Long productId;
-        private Integer productCnt;
-    }
+    private Integer productCnt;
+
+//    private Long memberId;
+//
+//    private List<OrderDto> orderDtos;
+//
+//    @Data
+//    @Builder
+//    @AllArgsConstructor
+//    @NoArgsConstructor
+//    public static class OrderDto { // class 내에 만들거라 static, 직접 접근 가능해야해서 public
+//        private Long productId;
+//        private Integer productCnt;
+//    }
 
     public Ordering toEntity(Member member){
         return Ordering.builder()

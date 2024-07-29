@@ -1,21 +1,21 @@
 package beyond.ordersystem.member.service;
 
+import beyond.ordersystem.common.domain.Address;
 import beyond.ordersystem.member.domain.Member;
 import beyond.ordersystem.member.dto.MemberCreateReqDto;
-import beyond.ordersystem.member.dto.MemberListResDto;
+import beyond.ordersystem.member.dto.MemberResDto;
 import beyond.ordersystem.member.dto.MemberLoginDto;
 import beyond.ordersystem.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -61,20 +61,36 @@ public class MemberService {
     /**
      * 회원 목록 조회
      */
-    public Page<MemberListResDto> memberList(Pageable pageable) {
+    public Page<MemberResDto> memberList(Pageable pageable) {
         Page<Member> memberList = memberRepository.findAll(pageable);
 
-        Page<MemberListResDto> memberListResDtos = memberList.map(a->a.listFromEntity());
+        Page<MemberResDto> memberListResDtos = memberList.map(a->a.listFromEntity());
 //        for (Member member: memberList) {
 //            memberListResDtos.add(member.listfromEntity());
 //        }
         return memberListResDtos;
     }
 
+
+    /**
+     * 내 정보 조회
+     */
+    public MemberResDto findMyInfo() {
+
+        String myEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member myMember = memberRepository.findByEmail(myEmail).orElseThrow(
+                () -> new EntityNotFoundException("no email")
+        );
+        String myName = myMember.getName();
+        Address myAddress = myMember.getAddress();
+
+        return myMember.myDetailFromEntity(myEmail, myName, myAddress);
+    }
+
+
     /**
      * 로그인
      */
-
     public Member login(MemberLoginDto dto) {
 
         // email의 존재 여부 확인

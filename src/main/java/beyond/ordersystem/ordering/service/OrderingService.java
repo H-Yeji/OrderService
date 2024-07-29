@@ -1,21 +1,19 @@
 package beyond.ordersystem.ordering.service;
 
 import beyond.ordersystem.member.domain.Member;
-import beyond.ordersystem.member.dto.MemberListResDto;
 import beyond.ordersystem.member.repository.MemberRepository;
 import beyond.ordersystem.ordering.domain.OrderDetail;
 import beyond.ordersystem.ordering.domain.OrderStatus;
 import beyond.ordersystem.ordering.domain.Ordering;
 import beyond.ordersystem.ordering.dto.OrderCreateReqDto;
 import beyond.ordersystem.ordering.dto.OrderListResDto;
+import beyond.ordersystem.ordering.dto.OrderResDto;
 import beyond.ordersystem.ordering.repository.OrderDetailRepository;
 import beyond.ordersystem.ordering.repository.OrderingRepository;
 import beyond.ordersystem.product.domain.Product;
 import beyond.ordersystem.product.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.criterion.Order;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +43,7 @@ public class OrderingService {
      * 주문 등록
      */
     @Transactional
-    public Ordering createOrder(OrderCreateReqDto dto) {
+    public Ordering createOrder(List<OrderCreateReqDto> dtoList) {
 
 //        // 방법1 => 쉬운방식
 //        // Ordering생성 : member_id, status
@@ -66,7 +64,12 @@ public class OrderingService {
 //        return ordering;
 
         // 방법2 => jpa 최적화 방식 (orderDetailRepository 사용하지 않은 버전 => cascade.persist랑 같이확인)
-        Member member = memberRepository.findById(dto.getMemberId()).orElseThrow(() -> new EntityNotFoundException("없음"));
+//        Member member = memberRepository.findById(dto.getMemberId()).orElseThrow(() -> new EntityNotFoundException("없음"));
+        String memberEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member member = memberRepository.findByEmail(memberEmail).orElseThrow(
+                () -> new EntityNotFoundException("없음")
+        );
+
         // orderStatus는 초기화했고, orderDetail은 없다고 가정 (아래서 add하는 방식 사용하기 위해)
         // 즉, member만 builder에 넣어주면 됨 => 이렇게 ordering 객체 생성
         Ordering ordering = Ordering.builder()
@@ -74,9 +77,10 @@ public class OrderingService {
                 //.orderDetails()
                 .build();
 
-        for(OrderCreateReqDto.OrderDto orderDto : dto.getOrderDtos()){
-            Product product = productRepository.findById(orderDto.getProductId()).orElse(null);
-            int quantity = orderDto.getProductCnt();
+
+        for(OrderCreateReqDto orderCreateReqDto : dtoList){
+            Product product = productRepository.findById(orderCreateReqDto.getProductId()).orElse(null);
+            int quantity = orderCreateReqDto.getProductCnt();
 
             // 구매 가능한지 재고 비교
             if (product.getStockQuantity() < quantity) {
@@ -103,13 +107,49 @@ public class OrderingService {
      */
     public List<OrderListResDto> orderList() {
 
-        List<OrderDetail> orderDetailList = orderDetailRepository.findAll();
+        List<Ordering> orderDetailList = orderingRepository.findAll();
 
         List<OrderListResDto> orderListResDtos = new ArrayList<>();
-        for (OrderDetail orderDetail : orderDetailList) {
-            orderListResDtos.add(orderDetail.listFromEntity());
+        for (Ordering ordering : orderDetailList) {
+            orderListResDtos.add(ordering.listFromEntity());
         }
 
         return orderListResDtos;
+    }
+
+    /**
+     * 내 주문 조회
+     */
+    public List<OrderListResDto> myOrders() {
+
+        String myEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Member myMember = memberRepository.findByEmail(myEmail).orElseThrow(
+                () -> new EntityNotFoundException("no email")
+        );
+        log.info("myMember");
+
+        List<Ordering> myOrders = orderingRepository.findByMember(myMember);
+
+        log.info("order Detail list : " + myOrders);
+        List<OrderListResDto> orderResDtos = new ArrayList<>();
+        for (Ordering ordering : myOrders) {
+            orderResDtos.add(ordering.listFromEntity());
+        }
+        return orderResDtos;
+    }
+
+    /**
+     * 주문 취소
+     */
+    @Transactional
+    public Ordering orderCancel(Long id) {
+
+        Ordering ordering = orderingRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("not found")
+        );
+
+        ordering.updateStatus(OrderStatus.CANCELD); // update로 ordered > canceld로 변경
+
+        return ordering;
     }
 }
