@@ -33,7 +33,7 @@ public class ProductController {
     // 파일도 받는건데 다시 공부 ㄱㄱ (requestBody로 받지 않는 이유 -> 파일때문인데 확인)
     public ResponseEntity<?> createProduct(ProductCreateReqDto dto) {
 
-        Product product = productService.productAwsCreate(dto);
+        Product product = productService.createProduct(dto);
 
         CommonResDto commonResDto = new CommonResDto(HttpStatus.CREATED, "member created successfully", product.getId());
         return new ResponseEntity<>(commonResDto, HttpStatus.CREATED);
