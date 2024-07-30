@@ -29,7 +29,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
         configuration.setHostName(host);
         configuration.setPort(port);
-        // 1번 db 사용
+        // 1번 db 사용 - redis에서 select 1로 확인
         configuration.setDatabase(1);
         return new LettuceConnectionFactory(configuration);
 
