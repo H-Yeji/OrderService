@@ -1,6 +1,7 @@
 package beyond.ordersystem.product.service;
 
 import beyond.ordersystem.common.service.StockInventoryService;
+import beyond.ordersystem.ordering.dto.StockDecreaseEvent;
 import beyond.ordersystem.product.domain.Product;
 import beyond.ordersystem.product.dto.ProductCreateReqDto;
 import beyond.ordersystem.product.dto.ProductListResDto;
@@ -17,6 +18,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -116,6 +118,17 @@ public class ProductService {
         Page<ProductListResDto> productListResDtos = products.map(a -> a.listFromEntity());
 
         return productListResDtos;
+    }
+
+    /**
+     * 재고 감소 -> rabbit mq
+     */
+    public void stockDecrease(StockDecreaseEvent event) {
+
+        Product product = productRepository.findById(event.getProductId()).orElseThrow(
+                () -> new EntityNotFoundException("product없음")
+        );
+        product.updateStockQuantity(event.getProductCnt());
     }
 
 
