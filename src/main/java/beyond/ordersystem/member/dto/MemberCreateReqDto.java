@@ -21,7 +21,7 @@ public class MemberCreateReqDto {
     @NotEmpty(message = "email is essential") // 에러 터뜨림
     private String email;
     @NotEmpty(message = "password is essential")
-    //@Size(min = 8, message = "password minimum length is 8")
+    @Size(min = 8, message = "password minimum length is 8")
     // size 어노테이션에서 길이 조건을 걸어놔서 handler에서 MethodArgumentNotValidException 에러가 터짐
     // 주석처리하면 비밀번호가 너무 짧습니다 (service에서 걸어둔거)가 나옴
     private String password;
