@@ -5,6 +5,7 @@ import beyond.ordersystem.member.domain.Member;
 import beyond.ordersystem.member.dto.MemberCreateReqDto;
 import beyond.ordersystem.member.dto.MemberResDto;
 import beyond.ordersystem.member.dto.MemberLoginDto;
+import beyond.ordersystem.member.dto.MemberUpdatePwdDto;
 import beyond.ordersystem.member.repository.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.TransactionScoped;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -105,5 +108,21 @@ public class MemberService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         return member;
+    }
+
+    /**
+     * 회원 비밀번호 수정
+     */
+    @Transactional
+    public void updatePassword(MemberUpdatePwdDto dto) {
+
+        Member findMember = memberRepository.findByEmail(dto.getEmail()).orElseThrow(
+                () -> new EntityNotFoundException("해당 이메일의 회원이 없음")
+        );
+        // 이메일 찾아와서 작성한 비밀번호와 기존의 비밀번호가 같은지 비교
+        if (!passwordEncoder.matches(dto.getAsIsPassword(), findMember.getPassword())) { //⭐ matches하는 순서 주의
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        findMember.updateFromEntity(passwordEncoder.encode(dto.getToBePassword()));
     }
 }

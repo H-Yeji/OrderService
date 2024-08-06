@@ -4,14 +4,12 @@ import beyond.ordersystem.common.auth.JwtTokenProvider;
 import beyond.ordersystem.common.dto.CommonErrorDto;
 import beyond.ordersystem.common.dto.CommonResDto;
 import beyond.ordersystem.member.domain.Member;
-import beyond.ordersystem.member.dto.MemberCreateReqDto;
-import beyond.ordersystem.member.dto.MemberRefreshDto;
-import beyond.ordersystem.member.dto.MemberResDto;
-import beyond.ordersystem.member.dto.MemberLoginDto;
+import beyond.ordersystem.member.dto.*;
 import beyond.ordersystem.member.service.MemberService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +24,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -147,8 +146,8 @@ public class MemberController {
             // 코드를 통해 rt 검증
             claims = Jwts.parser().setSigningKey(secretKeyRt).parseClaimsJws(rt).getBody();
         } catch (Exception e) {
-            return new ResponseEntity<>(new CommonErrorDto(HttpStatus.UNAUTHORIZED.value(), "invalid refresh token"),
-                    HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new CommonErrorDto(HttpStatus.BAD_REQUEST.value(), "invalid refresh token"),
+                    HttpStatus.BAD_REQUEST);
         }
 
         // accessToken 새로 만들기
@@ -162,8 +161,8 @@ public class MemberController {
 
         // rt가 비어있거나 같지 않으면 에러 터뜨려
         if (obj == null || !obj.toString().equals(rt)) {
-            return new ResponseEntity<>(new CommonErrorDto(HttpStatus.UNAUTHORIZED.value(), "invalid refresh token"),
-                    HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new CommonErrorDto(HttpStatus.BAD_REQUEST.value(), "invalid refresh token"),
+                    HttpStatus.BAD_REQUEST);
         }
         // redis에 일치하는 rt가 있다면 이어서 ㄱㄱ
         String newAt = jwtTokenProvider.createToken(email, role); // 새로 at를 받아야하니까 createToken
@@ -175,6 +174,20 @@ public class MemberController {
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
     }
 
+    /**
+     * 비밀번호 변경
+     */
+    @PatchMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody MemberUpdatePwdDto dto) {
 
+        try {
+            memberService.updatePassword(dto);
 
+            CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "비밀번호 변경 완료", "ok");
+            return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            CommonErrorDto commonErrorDto = new CommonErrorDto(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+            return new ResponseEntity<>(commonErrorDto, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

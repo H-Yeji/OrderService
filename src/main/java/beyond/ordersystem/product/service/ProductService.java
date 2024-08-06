@@ -120,6 +120,7 @@ public class ProductService {
         return productListResDtos;
     }
 
+
     /**
      * 재고 감소 -> rabbit mq
      */
