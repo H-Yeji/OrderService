@@ -4,6 +4,7 @@ import beyond.ordersystem.common.dto.CommonResDto;
 import beyond.ordersystem.product.domain.Product;
 import beyond.ordersystem.product.dto.ProductCreateReqDto;
 import beyond.ordersystem.product.dto.ProductListResDto;
+import beyond.ordersystem.product.dto.ProductSearchDto;
 import beyond.ordersystem.product.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/product")
@@ -39,13 +39,26 @@ public class ProductController {
         return new ResponseEntity<>(commonResDto, HttpStatus.CREATED);
     }
 
+//    /**
+//     * 상품 목록 조회
+//     */
+//    @GetMapping("/list")
+//    public ResponseEntity<?> productList(Pageable pageable) {
+//
+//        Page<ProductListResDto> productListResDtos = productService.productList(pageable);
+//
+//        CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "정상조회 완료", productListResDtos);
+//        return new ResponseEntity<>(commonResDto, HttpStatus.OK);
+//
+//    }
+
     /**
-     * 상품 목록 조회
+     * 상품 목록 조회 -> 검색기능 추가
      */
     @GetMapping("/list")
-    public ResponseEntity<?> productList(Pageable pageable) {
+    public ResponseEntity<?> productList(ProductSearchDto searchDto, Pageable pageable) {
 
-        Page<ProductListResDto> productListResDtos = productService.productList(pageable);
+        Page<ProductListResDto> productListResDtos = productService.productList(searchDto, pageable);
 
         CommonResDto commonResDto = new CommonResDto(HttpStatus.OK, "정상조회 완료", productListResDtos);
         return new ResponseEntity<>(commonResDto, HttpStatus.OK);
