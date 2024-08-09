@@ -3,6 +3,7 @@ package beyond.ordersystem.ordering.service;
 import beyond.ordersystem.common.service.StockInventoryService;
 import beyond.ordersystem.member.domain.Member;
 import beyond.ordersystem.member.repository.MemberRepository;
+import beyond.ordersystem.ordering.controller.SSEController;
 import beyond.ordersystem.ordering.domain.OrderDetail;
 import beyond.ordersystem.ordering.domain.OrderStatus;
 import beyond.ordersystem.ordering.domain.Ordering;
@@ -34,15 +35,16 @@ public class OrderingService {
     private final ProductRepository productRepository;
     private final StockInventoryService stockInventoryService;
     private final StockDecreaseEventHandler stockDecreaseEventHandler;
+    private final SSEController sseController;
 
-
-    public OrderingService(OrderingRepository orderingRepository, OrderDetailRepository orderDetailRepository, MemberRepository memberRepository, ProductRepository productRepository, StockInventoryService stockInventoryService, StockDecreaseEventHandler stockDecreaseEventHandler) {
+    public OrderingService(OrderingRepository orderingRepository, OrderDetailRepository orderDetailRepository, MemberRepository memberRepository, ProductRepository productRepository, StockInventoryService stockInventoryService, StockDecreaseEventHandler stockDecreaseEventHandler, SSEController sseController) {
         this.orderingRepository = orderingRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.memberRepository = memberRepository;
         this.productRepository = productRepository;
         this.stockInventoryService = stockInventoryService;
         this.stockDecreaseEventHandler = stockDecreaseEventHandler;
+        this.sseController = sseController;
     }
 
     /**
@@ -102,6 +104,11 @@ public class OrderingService {
             ordering.getOrderDetails().add(orderDetail);
         }
         Ordering savedOrdering = orderingRepository.save(ordering);
+
+        // 📢📢 save하고 나면 너 주문했어 !! 알려주는 sse 추가
+        sseController.publishMessage(savedOrdering.listFromEntity(), "admin@test.com");// 누구한테 줄거야? admin한테
+
+
         return savedOrdering;
     }
 
@@ -155,6 +162,7 @@ public class OrderingService {
 
         return ordering;
     }
+
 
 
 //         createOrder에서 방법(1)
